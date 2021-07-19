@@ -1,84 +1,111 @@
+let playerCount = 0,
+  computerCount = 0;
+
+// Element selection and creation
+const container = document.querySelector("#container");
+const btn = document.querySelectorAll("#choice button");
+const resultDiv = document.createElement("div");
+const resultText = document.createElement("p");
+const scoreDiv = document.createElement("div");
+const playerScore = document.createElement("p");
+const computerScore = document.createElement("p");
+
+window.addEventListener("load", () => {
+  resultText.textContent = "";
+  resultDiv.appendChild(resultText);
+  playerScore.textContent = `Player : ${playerCount}`;
+  computerScore.textContent = `Computer : ${computerCount}`;
+  scoreDiv.appendChild(playerScore);
+  scoreDiv.appendChild(computerScore);
+  container.appendChild(scoreDiv);
+  container.appendChild(resultDiv);
+});
+
+// Random selection by the computer
 function computerPlay() {
   let option = ["rock", "paper", "scissors"];
   let randomNum = Math.floor(Math.random() * 3);
   return option[randomNum];
 }
 
+// Choice comparison for each round
 function playRound(playerSelection, computerSelection) {
   if (playerSelection === computerSelection) {
-    console.log("It's a tie");
     return "It's a tie";
   } else {
     if (playerSelection === "rock") {
       if (computerSelection === "scissors") {
-        console.log("You win! Rock beats Scissors");
         return "You win! Rock beats Scissors";
       } else if (computerSelection === "paper") {
-        console.log("You lose! Paper covers Rock");
         return "You lose! Paper covers Rock";
       }
     } else if (playerSelection === "paper") {
       if (computerSelection === "rock") {
-        console.log("You win! Paper Covers Rock");
         return "You win! Paper Covers Rock";
       } else if (computerSelection === "scissors") {
-        console.log("You lose! Scissors cuts Paper");
         return "You lose! Scissors cuts Paper";
       }
     } else if (playerSelection === "scissors") {
       if (computerSelection === "paper") {
-        console.log("You win! Scissors cuts Paper");
         return "You win! Scissors cuts Paper";
       } else if (computerSelection === "rock") {
-        console.log("You lose! Rock beats Scissors");
         return "You lose! Rock beats Scissors";
       }
     }
   }
 }
 
-function game() {
-  let userInput;
-  let playerChoice, computerChoice;
-  let playerCount = 0,
-    computerCount = 0;
-  let result;
-  for (let i = 1; i <= 5; ++i) {
-    userInput = prompt("Choose an option");
-    if (userInput === null || userInput === undefined) {
-      console.log("Please enter an option");
-    } else {
-      playerChoice = userInput.toLowerCase();
-      console.log("\n" + playerChoice);
-      computerChoice = computerPlay().toLowerCase();
-      console.log(computerChoice);
-      if (
-        playerChoice === "rock" ||
-        playerChoice === "paper" ||
-        playerChoice === "scissors"
-      ) {
-        result = playRound(playerChoice, computerChoice);
-      } else {
-        console.log(
-          "Enter any one option among rock, paper or scissors only, Round disqualified"
-        );
-        i -= 1;
-        result = "Round disqualified";
-      }
-      if (/win/gi.test(result)) {
-        playerCount++;
-      } else if (/lose/gi.test(result)) {
-        computerCount++;
-      }
-    }
-  }
-  if (playerCount > computerCount) {
-    console.log("\n\nPlayer wins");
-  } else if (playerCount < computerCount) {
-    console.log("\n\nComputer wins");
+// Update UI to show results
+function updateUI(result) {
+  resultText.textContent = result;
+  playerScore.textContent = `Player : ${playerCount}`;
+  computerScore.textContent = `Computer : ${computerCount}`;
+  if (/win/gi.test(result)) {
+    resultText.style.cssText = "font-size: 20px; color:green";
+  } else if (/lose/gi.test(result)) {
+    resultText.style.cssText = "font-size: 20px; color:red";
   } else {
-    console.log("\n\nIt's a tie");
+    resultText.style.cssText = "font-size: 20px; color:black";
+  }
+
+  if (playerCount === 5) {
+    alert("YOU WIN!!!");
+    resetGame();
+  } else if (computerCount === 5) {
+    alert("YOU LOSE!!!");
+    resetGame();
   }
 }
 
-game();
+// reset the ui after either reaches 5 score
+function resetGame() {
+  (playerCount = 0), (computerCount = 0);
+  playerScore.textContent = `Player : ${playerCount}`;
+  computerScore.textContent = `Computer : ${computerCount}`;
+  resultText.textContent = "";
+}
+
+function game(e) {
+  console.clear();
+  let playerChoice, computerChoice;
+  let result;
+  playerChoice = e.target.value.toLowerCase();
+  console.log("\n" + playerChoice);
+  computerChoice = computerPlay().toLowerCase();
+  console.log(computerChoice);
+  result = playRound(playerChoice, computerChoice);
+  console.log(result);
+  if (/win/gi.test(result)) {
+    playerCount++;
+  } else if (/lose/gi.test(result)) {
+    computerCount++;
+  }
+  console.log(playerCount);
+  console.log(computerCount);
+
+  updateUI(result);
+}
+
+btn.forEach((item) => {
+  item.addEventListener("click", (e) => game(e));
+});
